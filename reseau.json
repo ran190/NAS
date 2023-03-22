@@ -1,0 +1,130 @@
+{
+    "AS": [
+      {
+        "number": "100",
+        "IpRange": {
+          "start": "192:168:1:",
+          "prefix": "",
+          "number": "4"
+        },
+        "IpLoopbackRange": {
+          "start": "192:168:100:",
+          "prefix": "8"
+        },
+        "igp": {
+          "type": "ospf",
+          "routerID": "1.1.1."
+        },
+        "bgp": {
+          "routerID": "1.1.1."
+        },
+        "baseHostname": "R111",
+        "routers": [
+          {
+            "id": "1",
+            "connections":[
+              {
+                "router": "2",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+  
+            ],
+            "bgp": {
+              "out": {
+                "networks": "",
+                "filter": {
+                }
+              },
+              "in": {
+                "filter": {
+                }
+              }
+            }
+          },
+          {
+            "id": "2",
+            "connections":[
+              {
+                "router": "1",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              },
+              {
+                "router": "3",
+                "interface": "2",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+  
+            ],
+            "bgp": {
+              "out": {
+                "networks": "",
+                "filter": {
+                }
+              },
+              "in": {
+                "filter": {
+                }
+              }
+            }
+          },
+          {
+            "id": "3",
+            "connections":[
+              {
+                "router": "2",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+
+              },
+              {
+                "router": "4",
+                "interface": "2",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+              
+            ],
+            "bgp": {
+              "out": {
+                "networks": "",
+                "filter": {
+                }
+              },
+              "in": {
+                "filter": {
+                }
+              }
+            }
+          },
+          {
+            "id": "4",
+            "connections":[
+              {
+                "router": "3",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+            ],
+            "bgp": {
+              "out": {
+                "networks": "",
+                "filter": {
+                }
+              },
+              "in": {
+                "filter": {
+                }
+              }
+            }
+          }
+        ]
+    }
+    ]
+}

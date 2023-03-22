@@ -8,41 +8,36 @@ no aaa new-model
 no ip icmp rate-limit unreachable
 ip cef
 no ip domain lookup
-ipv6 unicast-routing
-ipv6 cef
+no ipv6 cef
 multilink bundle-name authenticated
 ip tcp synwait-time 5
 !
 {% if router.loopback %}
 interface {{ router.loopback.name }}
- no ip address
- ipv6 address {{router.loopback.add}}/{{router.loopback.prefix}}
- ipv6 enable
+ ip address {{router.loopback.add}} {{router.loopback.mask}}
 {% if router.loopback.rip %}
  ipv6 rip {{router.rip.process}} enable
 {% endif %}
 {% if router.loopback.ospf %}
- ipv6 ospf {{ router.ospf.process }} area {{ router.loopback.ospfArea }}
+ ip ospf {{ router.ospf.process }} area {{ router.loopback.ospfArea }}
 {%endif%}
 {%endif%}
 {% for interface in router.interfaces %}
 interface {{ interface.name }}
- no ip address
- ipv6 address {{interface.add}}/{{interface.prefix}}
- ipv6 enable
+ ip address {{interface.add}} {{interface.mask}}
 {% if interface.rip %}
  ipv6 rip {{router.rip.process}} enable
 {% endif %}
 {% if interface.ospf %}
- ipv6 ospf {{ router.ospf.process }} area {{ interface.ospfArea }}
- ipv6 ospf cost {{interface.ospfCost}}
+ ip ospf {{ router.ospf.process }} area {{ interface.ospfArea }}
+ ip ospf cost {{interface.ospfCost}}
 {% endif %}
 {% endfor %}
 {% if router.bgp %}
 router bgp {{router.bgp.as_number}}
  bgp router-id {{router.bgp.routerId}}
  bgp log-neighbor-changes
- no bgp default ipv4-unicast
+ bgp default ipv4-unicast
  {% for neighbor in router.bgp.neighbors %}
  neighbor {{neighbor.ipAdd}} remote-as {{neighbor.remote_as}}
   {% if router.loopback and not neighbor.noLoopback %}
@@ -51,8 +46,6 @@ router bgp {{router.bgp.as_number}}
  {%endfor%}
 {%endif%}
 address-family ipv4
-exit-address-family
-address-family ipv6 unicast
 {% for neighbor in router.bgp.neighbors %}
  neighbor {{neighbor.ipAdd}} activate
   {% if neighbor.routeMapIn %}
@@ -69,68 +62,26 @@ address-family ipv6 unicast
  network {{network.add}}/{{network.prefix}}
 {%endfor%}
 exit-address-family
+address-family ipv6 unicast
+exit-address-family
 ip forward-protocol nd
 no ip http server
 no ip http secure-server
 {% if router.rip %}
-ipv6 router rip {{router.rip.process}}
+ip router rip {{router.rip.process}}
  redistribute connected
 {% endif %}
 {% if router.ospf %}
-ipv6 router ospf {{router.ospf.process}}
+router ospf {{router.ospf.process}}
  router-id {{router.ospf.routerId}}
  {% for interface in router.ospf.passiveInterfaces %}
  passive-interface {{interface}}
  {% endfor %}
 {% endif %}
-{% if router.asPathAccessLists %}
-{% for asPathAccessList in router.asPathAccessLists %}
-ip as-path access-list {{asPathAccessList.name}} {{asPathAccessList.action}} {{asPathAccessList.as_path}}
-{% endfor %}
-{% endif %}
-{% if router.prefixLists %}
-{% for prefixList in router.prefixLists %}
-ipv6 access-list {{prefixList.name}}
-{% for prefix in prefixList.prefixes %}
- {{prefixList.action}} ipv6 {{prefix}} any
-{% endfor %}
-{% endfor %}
-{% endif %}
-{% if router.routeMapIns %}
-{% for routeMap in router.routeMapIns %}
-route-map {{routeMap.name}} {{routeMap.action}} {{routeMap.sequence}}
-  {% if routeMap.match == "as-path" %}
- match as-path {{routeMap.asPathAccessList}}
-  {% endif %}
-  {% if routeMap.match == "ipv6 address" %}
- match ipv6 address {{routeMap.ipv6AccessList}}
-  {% endif %}
-  {% for set in routeMap.sets %}
- set {{set}}
-  {% endfor %}
-{% endfor%}
-{%endif%}
-{% if router.routeMapOuts %}
-{% for routeMap in router.routeMapOuts %}
-route-map {{routeMap.name}} {{routeMap.action}} {{routeMap.sequence}}
-  {% if routeMap.match == "as-path" %}
- match as-path {{routeMap.asPathAccessList}}
-  {% endif %}
-  {% if routeMap.match == "ipv6 address" %}
- match ipv6 address {{routeMap.ipv6AccessList}}
-  {% endif %}
-  {% if routeMap.match == "community" %}
- match community {{routeMap.community}}
-  {% endif %}
-  {% for set in routeMap.sets %}
- set {{set}}
-  {% endfor %}
-{% endfor%}
-{%endif%}
-ip bgp-community new-format
-{% for community in router.communities %}
-ip community-list {{community.name}} {{community.action}} {{community.community}}
-{% endfor %}
+
+
+
+
 control-plane
 line con 0
 exec-timeout 0 0
