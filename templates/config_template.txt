@@ -16,7 +16,7 @@ ip tcp synwait-time 5
 interface {{ router.loopback.name }}
  ip address {{router.loopback.add}} {{router.loopback.mask}}
 {% if router.loopback.rip %}
- ipv6 rip {{router.rip.process}} enable
+ ip rip {{router.rip.process}} enable
 {% endif %}
 {% if router.loopback.ospf %}
  ip ospf {{ router.ospf.process }} area {{ router.loopback.ospfArea }}
@@ -26,12 +26,13 @@ interface {{ router.loopback.name }}
 interface {{ interface.name }}
  ip address {{interface.add}} {{interface.mask}}
 {% if interface.rip %}
- ipv6 rip {{router.rip.process}} enable
+ ip rip {{router.rip.process}} enable
 {% endif %}
 {% if interface.ospf %}
  ip ospf {{ router.ospf.process }} area {{ interface.ospfArea }}
- ip ospf cost {{interface.ospfCost}}
+ negotiation auto
 {% endif %}
+ mpls ip
 {% endfor %}
 {% if router.bgp %}
 router bgp {{router.bgp.as_number}}
@@ -74,6 +75,7 @@ ip router rip {{router.rip.process}}
 {% if router.ospf %}
 router ospf {{router.ospf.process}}
  router-id {{router.ospf.routerId}}
+ mpls ldp autoconfig area 0
  {% for interface in router.ospf.passiveInterfaces %}
  passive-interface {{interface}}
  {% endfor %}
