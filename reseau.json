@@ -21,6 +21,7 @@
         "baseHostname": "R111",
         "routers": [
           {
+            "name":"PE1",
             "id": "1",
             "connections":[
               {
@@ -44,6 +45,7 @@
             }
           },
           {
+            "name":"P1",
             "id": "2",
             "connections":[
               {
@@ -73,18 +75,19 @@
             }
           },
           {
+            "name":"P2",
             "id": "3",
             "connections":[
               {
                 "router": "2",
-                "interface": "1",
+                "interface": "2",
                 "ospfArea": "0",
                 "ospfCost": "1"
 
               },
               {
                 "router": "4",
-                "interface": "2",
+                "interface": "1",
                 "ospfArea": "0",
                 "ospfCost": "1"
               }
@@ -103,6 +106,7 @@
             }
           },
           {
+            "name":"PE2",
             "id": "4",
             "connections":[
               {

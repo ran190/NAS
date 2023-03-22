@@ -71,7 +71,7 @@ def handle_network(network):
                 routerObj.interfaces.append(inter)
             if(As['igp']['type'] == 'ospf'):
                 ospf = Igp()
-                ospf.process = router['id']
+                ospf.process = 1
                 ospf.routerId = As['igp']['routerID']+router['id']
                 ospf.passiveInterfaces = []
                 routerObj.ospf = ospf
