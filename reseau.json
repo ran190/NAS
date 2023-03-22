@@ -3,12 +3,12 @@
       {
         "number": "100",
         "IpRange": {
-          "start": "192:168:1:",
+          "start": "192.168.1.",
           "prefix": "",
           "number": "4"
         },
         "IpLoopbackRange": {
-          "start": "192:168:100:",
+          "start": "192.168.100.",
           "prefix": "8"
         },
         "igp": {
