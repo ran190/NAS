@@ -13,7 +13,7 @@ def handle_network(network):
         for router in As['routers']:
             routerObj = Router()
             routerObj.id = router['id']
-            routerObj.hostname = As['baseHostname']+router['id']
+            routerObj.hostname = router['name']
             intLoopback = Interface()
             intLoopback.name = 'Loopback0'
             intLoopback.add = As['IpLoopbackRange']['start']+router['id']
