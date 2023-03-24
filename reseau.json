@@ -1,0 +1,270 @@
+{
+    "AS": [
+      {
+        "number": "100",
+        "IpRange": {
+          "start": "192.168.1.",
+          "prefix": ""
+        },
+        "IpLoopbackRange": {
+          "start": "192.168.100.",
+          "prefix": ""
+        },
+        "igp": {
+          "type": "ospf",
+          "routerID": "1.1.1."
+        },
+        "bgp": {
+          "routerID": "1.1.1."
+        },
+        "routers": [
+          {
+            "name":"PE1",
+            "id": "1",
+            "bgp":1,
+            "connections":[
+              {
+                "router": "2",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+  
+            ]
+            
+          },
+          {
+            "name":"P1",
+            "id": "2",
+            "bgp":0,
+            "connections":[
+              {
+                "router": "1",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              },
+              {
+                "router": "3",
+                "interface": "2",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+  
+            ]
+            
+          },
+          {
+            "name":"P2",
+            "id": "3",
+            "bgp":0,
+            "connections":[
+              {
+                "router": "2",
+                "interface": "2",
+                "ospfArea": "0",
+                "ospfCost": "1"
+
+              },
+              {
+                "router": "4",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+              
+            ]
+          },
+          {
+            "name":"PE2",
+            "id": "4",
+            "bgp":1,
+            "connections":[
+              {
+                "router": "3",
+                "interface": "1",
+                "ospfArea": "0",
+                "ospfCost": "1"
+              }
+            ]
+          }
+        ]
+    },
+    {
+        "number": "200",
+        "IpRange": {
+          "start": "192.168.11.",
+          "prefix": ""
+        },
+        "IpLoopbackRange": {
+          "start": "192.168.101.",
+          "prefix": ""
+        },
+        "igp": {
+          "type": "ospf",
+          "routerID": "2.2.2."
+        },
+        "bgp": {
+          "routerID": "2.2.2."
+        },
+        "routers": [
+          {
+            "name":"CE1",
+            "id": "1",
+            "bgp":1,
+            "connections":[
+              {
+
+              }
+  
+            ]
+            
+          },
+          {
+            "name":"CE2",
+            "id": "2",
+            "bgp":1,
+            "connections":[{}
+  
+            ]
+            
+          }
+        ]
+    },
+    {
+        "number": "300",
+        "IpRange": {
+          "start": "192.168.11.",
+          "prefix": ""
+        },
+        "IpLoopbackRange": {
+          "start": "192.168.101.",
+          "prefix": ""
+        },
+        "igp": {
+          "type": "ospf",
+          "routerID": "3.3.3."
+        },
+        "bgp": {
+          "routerID": "3.3.3."
+        },
+        "routers": [
+          {
+            "name":"CE3",
+            "id": "1",
+            "bgp":1,
+            "connections":[
+              {}
+  
+            ]
+            
+          },
+          {
+            "name":"CE4",
+            "id": "2",
+            "bgp":1,
+            "connections":[{}
+  
+            ]
+            
+          }
+        ]
+    }
+
+    ],
+    "ASLink":{
+        "IpRange":{
+            "auto": 0,
+            "start": "",
+            "prefix": ""
+        },
+        "links":[
+        {
+            "firstAS": "100",
+            "firstRouter": "1",
+            "firstInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "add":"192.168.11.1",
+                "mask":"255.255.255.252"
+            },
+            "secondAS": "200",
+            "secondRouter": "1",
+            "secondInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "ospfCost": "1",
+                "add":"192.168.11.2",
+                "mask":"255.255.255.252"
+            }
+        },
+        {
+            "firstAS": "100",
+            "firstRouter": "4",
+            "firstInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "add":"192.168.21.1",
+                "mask":"255.255.255.252"
+            },
+            "secondAS": "200",
+            "secondRouter": "2",
+            "secondInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "ospfCost": "1",
+                "add":"192.168.21.2",
+                "mask":"255.255.255.252"
+            }
+        },
+        {
+            "firstAS": "100",
+            "firstRouter": "1",
+            "firstInterface":{
+                "id": "3",
+                "ospfArea": "0",
+                "add":"192.168.12.1",
+                "mask":"255.255.255.252"
+            },
+            "secondAS": "300",
+            "secondRouter": "1",
+            "secondInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "ospfCost": "1",
+                "add":"192.168.12.2",
+                "mask":"255.255.255.252"
+            }
+        },
+        {
+            "firstAS": "100",
+            "firstRouter": "4",
+            "firstInterface":{
+                "id": "3",
+                "ospfArea": "0",
+                "add":"192.168.22.1",
+                "mask":"255.255.255.252"
+            },
+            "secondAS": "300",
+            "secondRouter": "2",
+            "secondInterface":{
+                "id": "2",
+                "ospfArea": "0",
+                "ospfCost": "1",
+                "add":"192.168.22.2",
+                "mask":"255.255.255.252"
+            }
+        }
+        ]
+    },
+    "routerMap": {
+        "PE1": 1,
+        "P1": 2,
+        "P2": 3,
+        "PE2": 4,
+        "CE1" :5,
+        "CE2" :6,
+        "CE3" :7,
+        "CE4" :8
+    }
+}

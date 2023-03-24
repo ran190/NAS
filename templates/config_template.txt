@@ -8,8 +8,13 @@ no aaa new-model
 no ip icmp rate-limit unreachable
 ip cef
 no ip domain lookup
+<<<<<<< Updated upstream
 ipv6 unicast-routing
 ipv6 cef
+=======
+no ipv6 cef
+mpls label protocol ldp
+>>>>>>> Stashed changes
 multilink bundle-name authenticated
 ip tcp synwait-time 5
 !
@@ -38,11 +43,16 @@ interface {{ interface.name }}
  ipv6 ospf cost {{interface.ospfCost}}
 {% endif %}
 {% endfor %}
-{% if router.bgp %}
+{% if router.bgp.bool %}
 router bgp {{router.bgp.as_number}}
+{% if router.bgp.routerId %} 
  bgp router-id {{router.bgp.routerId}}
+{% endif %}
  bgp log-neighbor-changes
+<<<<<<< Updated upstream
  no bgp default ipv4-unicast
+=======
+>>>>>>> Stashed changes
  {% for neighbor in router.bgp.neighbors %}
  neighbor {{neighbor.ipAdd}} remote-as {{neighbor.remote_as}}
   {% if router.loopback and not neighbor.noLoopback %}
@@ -50,19 +60,17 @@ router bgp {{router.bgp.as_number}}
   {% endif %}
  {%endfor%}
 {%endif%}
+<<<<<<< Updated upstream
 address-family ipv4
 exit-address-family
 address-family ipv6 unicast
+=======
+address-family vpnv4
+>>>>>>> Stashed changes
 {% for neighbor in router.bgp.neighbors %}
  neighbor {{neighbor.ipAdd}} activate
-  {% if neighbor.routeMapIn %}
- neighbor {{neighbor.ipAdd}} route-map {{neighbor.routeMapIn}} in
-  {% endif %}
-  {% if neighbor.routeMapOut %}
- neighbor {{neighbor.ipAdd}} route-map {{neighbor.routeMapOut}} out
-  {% endif %}
   {% if neighbor.sendCommunity %}
- neighbor {{neighbor.ipAdd}} send-community
+ neighbor {{neighbor.ipAdd}} send-community extended
   {% endif %}
 {%endfor%}
 {% for network in router.bgp.networks %}
