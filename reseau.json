@@ -21,13 +21,14 @@
           {
             "name":"PE1",
             "id": "1",
-            "bgp":1,
+            "bgp":"True",
             "connections":[
               {
                 "router": "2",
                 "interface": "1",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"True"
               }
   
             ]
@@ -36,19 +37,21 @@
           {
             "name":"P1",
             "id": "2",
-            "bgp":0,
+            "bgp":"False",
             "connections":[
               {
                 "router": "1",
                 "interface": "1",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"False"
               },
               {
                 "router": "3",
                 "interface": "2",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"False"
               }
   
             ]
@@ -57,20 +60,22 @@
           {
             "name":"P2",
             "id": "3",
-            "bgp":0,
+            "bgp":"False",
             "connections":[
               {
                 "router": "2",
                 "interface": "2",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"False"
 
               },
               {
                 "router": "4",
                 "interface": "1",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"False"
               }
               
             ]
@@ -78,13 +83,14 @@
           {
             "name":"PE2",
             "id": "4",
-            "bgp":1,
+            "bgp":"True",
             "connections":[
               {
                 "router": "3",
                 "interface": "1",
                 "ospfArea": "0",
-                "ospfCost": "1"
+                "ospfCost": "1",
+                "mpls":"True"
               }
             ]
           }
@@ -111,7 +117,7 @@
           {
             "name":"CE1",
             "id": "1",
-            "bgp":1,
+            "bgp":"True",
             "connections":[
               {
 
@@ -123,7 +129,7 @@
           {
             "name":"CE2",
             "id": "2",
-            "bgp":1,
+            "bgp":"True",
             "connections":[{}
   
             ]
@@ -152,7 +158,7 @@
           {
             "name":"CE3",
             "id": "1",
-            "bgp":1,
+            "bgp":"True",
             "connections":[
               {}
   
@@ -162,7 +168,7 @@
           {
             "name":"CE4",
             "id": "2",
-            "bgp":1,
+            "bgp":"True",
             "connections":[{}
   
             ]
@@ -174,7 +180,7 @@
     ],
     "ASLink":{
         "IpRange":{
-            "auto": 0,
+            "auto": "False",
             "start": "",
             "prefix": ""
         },
