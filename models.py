@@ -1,7 +1,8 @@
 class Router:
     pass
 
-
+class Vrf:
+    pass
 class Interface:
     pass
 

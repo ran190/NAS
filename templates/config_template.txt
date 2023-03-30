@@ -8,7 +8,16 @@ boot-start-marker
 boot-end-marker
 !
 !
-
+{% for key,vrf in router.vrfs.items() %}
+vrf definition {{key}}
+ rd {{router.bgp.as_number}}:1
+ route-target export {{router.bgp.as_number}}:{{vrf.as_target}}
+ route-target import {{router.bgp.as_number}}:{{vrf.as_target}}
+ !
+ address-family ipv4
+ exit-address-family
+!
+{% endfor %}
 !
 no aaa new-model
 no ip icmp rate-limit unreachable
@@ -69,6 +78,15 @@ address-family vpnv4
 {%endfor%}
 exit-address-family
 !
+{% for key,vrf in router.vrfs.items() %}
+address-family ipv4 vrf {{key}}
+  {% for add in vrf.add %}
+  neighbor {{add}} remote-as {{vrf.as_target}}
+  neighbor {{add}} activate
+  {%endfor%}
+ exit-address-family
+!
+{%endfor%}
 !
 address-family ipv6 unicast
 exit-address-family

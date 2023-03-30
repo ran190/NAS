@@ -1,7 +1,7 @@
 import json
 import os
 
-from models import Router, Interface, Igp, Neighbor, Network, AdjRib, RouteMap, AsPathAccessList, PrefixList, Community
+from models import Router, Interface, Igp, Neighbor,Vrf
 
 from jinja2 import Environment, FileSystemLoader
 def handle_network(network):
@@ -23,14 +23,15 @@ def handle_network(network):
                 intLoopback.ospf = True
                 intLoopback.ospfArea = "0"
                 intLoopback.ospfCost = "0"
-            elif As['igp']['type'] == 'rip':
-                intLoopback.rip = True
             routerObj.loopback = intLoopback
             routerObj.interfaces = []
             for connection in router['connections']:
                 if connection:
                     inter = Interface()
                     inter.name = "GigabitEthernet"+connection['interface']+"/0"
+                    if connection['mpls']=="True":
+                        inter.mpls=True
+                        #routerObj.mpls=True
                     #Si routeur def dans tab  
                     if router['id'] in ipNetworkUsed:
                         #Si conx avec autre routeur def
@@ -67,8 +68,6 @@ def handle_network(network):
                         inter.ospf=True
                         inter.ospfArea = connection['ospfArea']
                         inter.ospfCost = connection['ospfCost']
-                    elif As['igp']['type'] == 'rip':
-                        inter.rip= True
                     routerObj.interfaces.append(inter)
             if(As['igp']['type'] == 'ospf'):
                 ospf = Igp()
@@ -76,21 +75,19 @@ def handle_network(network):
                 ospf.routerId = As['igp']['routerID']+router['id']
                 ospf.passiveInterfaces = []
                 routerObj.ospf = ospf
-            elif(As['igp']['type'] == 'rip'):
-                rip = Igp()
-                rip.process = routerObj.hostname
-                rip.passiveInterfaces = []
-                routerObj.rip = rip
+
+            #Partie BGP
             bgp = Igp()
-            if router['bgp']==1:
+            #Si bgp sur routeur
+            if router['bgp']=="True":
                 bgp.bool=True
                 bgp.as_number = As['number']
                 bgp.routerId = As['bgp']['routerID']+router['id']
                 bgp.neighbors = []
                 routerObj.bgp = bgp
-                
+                #def les neighbor
                 for routeur in As['routers']:
-                    if routeur['id'] != router['id'] and routeur["bgp"]==1:
+                    if routeur['id'] != router['id'] and routeur["bgp"]=="True":
                         neighbor = Neighbor()
                         neighbor.remote_as = As['number']
                         neighbor.ipAdd = As['IpLoopbackRange']['start']+routeur['id']
@@ -100,21 +97,23 @@ def handle_network(network):
             else:
                 bgp.bool=False
             routerObj.bgp = bgp
+            routerObj.vrfs={}
             routerAsList[routerObj.id] = routerObj
         ASList[As['number']] = routerAsList
+    #Lien inter AS
+    IpRangeLink=0
     as_link_ = network['ASLink']
     for link in as_link_['links']:
-        #IpRangeLink += 1
+        IpRangeLink += 1
+        #Def des interface 
         int1 = Interface()
         int2 = Interface()
         int1.name = "GigabitEthernet"+link['firstInterface']['id']+"/0"
         int2.name = "GigabitEthernet"+link['secondInterface']['id']+"/0"
-        if as_link_['IpRange']['auto']==1:
-            add1 = network['ASLink']['IpRange']['start'] + str(hex(IpRangeLink)[2:]) + "::" + str(
-                hex(int(link['firstAS']))[2:]) + ":"+str(hex(int(link['firstRouter']))[2:])
+        if as_link_['IpRange']['auto']=="True":
+            add1 = network['ASLink']['IpRange']['start'] + IpRangeLink + "." + link['firstAS'] + "."+link['firstRouter']
             int1.add = add1
-            add2 = network['ASLink']['IpRange']['start'] + str(hex(IpRangeLink)[2:]) + "::" + str(
-                hex(int(link['secondAS']))[2:]) +":"+ str(hex(int(link['secondRouter']))[2:])
+            add2 = network['ASLink']['IpRange']['start'] + str(hex(IpRangeLink)[2:]) + "." + link['secondAS'] +"."+ link['secondRouter']
             int2.add = add2
             int1.mask = network['ASLink']['IpRange']['prefix']
             int2.mask = network['ASLink']['IpRange']['prefix']
@@ -123,36 +122,38 @@ def handle_network(network):
             int2.add = link["secondInterface"]["add"]
             int1.mask = link["firstInterface"]["mask"]
             int2.mask = link["secondInterface"]["mask"]
-
         ASList[link['firstAS']][link['firstRouter']].interfaces.append(int1)
         ASList[link['secondAS']][link['secondRouter']].interfaces.append(int2)
+        #Rajout des int en passive int
         if hasattr(ASList[link['firstAS']][link['firstRouter']], "ospf"):
             int1.ospf = True
             int1.ospfArea = link['firstInterface']['ospfArea']
-            #int1.ospfCost = link['firstInterface']['ospfCost']
 
             ASList[link['firstAS']][link['firstRouter']].ospf.passiveInterfaces.append(int1.name)
-        elif hasattr(ASList[link['firstAS']][link['firstRouter']],"rip"):
-            int1.rip = True
-            ASList[link['firstAS']][link['firstRouter']].rip.passiveInterfaces.append(int1.name)
         if hasattr(ASList[link['secondAS']][link['secondRouter']], "ospf"):
             int2.ospf = True
             int2.ospfArea = link['secondInterface']['ospfArea']
 
             ASList[link['secondAS']][link['secondRouter']].ospf.passiveInterfaces.append(int2.name)
-        elif hasattr(ASList[link['secondAS']][link['secondRouter']], "rip"):
-            int2.rip = True
-            ASList[link['secondAS']][link['secondRouter']].rip.passiveInterfaces.append(int2.name)
-        neighb1 = Neighbor()
-        neighb1.remote_as = link['firstAS']
-        neighb1.ipAdd = int1.add
-        neighb1.noLoopback = True
-        neighb2 = Neighbor()
-        neighb2.remote_as = link['secondAS']
-        neighb2.ipAdd = int2.add
-        neighb2.noLoopback = True
-        ASList[link['firstAS']][link['firstRouter']].bgp.neighbors.append(neighb2)
-        ASList[link['secondAS']][link['secondRouter']].bgp.neighbors.append(neighb1)
+        if link['vrfName']!="":
+            vrf= Vrf()
+            if link['vrfName'] in ASList[link['firstAS']][link['firstRouter']].vrfs :
+                ASList[link['firstAS']][link['firstRouter']].vrfs[link['vrfName']].add.append(int2.add)
+            else:
+                vrf.as_target=link['secondAS']
+                vrf.add=[int2.add]
+                ASList[link['firstAS']][link['firstRouter']].vrfs[link['vrfName']]=vrf
+        else:
+            neighb1 = Neighbor()
+            neighb1.remote_as = link['firstAS']
+            neighb1.ipAdd = int1.add
+            neighb1.noLoopback = True
+            neighb2 = Neighbor()
+            neighb2.remote_as = link['secondAS']
+            neighb2.ipAdd = int2.add
+            neighb2.noLoopback = True
+            ASList[link['firstAS']][link['firstRouter']].bgp.neighbors.append(neighb2)
+            ASList[link['secondAS']][link['secondRouter']].bgp.neighbors.append(neighb1)
     
 
 
@@ -167,7 +168,7 @@ if __name__ == '__main__':
     
     for AS in ASList.values():
         for router in AS.values():
-            print(router.hostname)
+            print(router.vrfs)
             #path = router.hostname+".cfg"
             path = "../Reseau_NAS/project-files/dynamips"
             cfg_file = 'i' + str(load['routerMap'][router.hostname]) + "_startup-config.cfg"
@@ -178,6 +179,7 @@ if __name__ == '__main__':
             f2 = open(real_path, "w")
             f2.write(template.render(router=router))
             f2.close()
+            print(router.hostname)
 
     f.close()
 
