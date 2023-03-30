@@ -98,8 +98,6 @@ address-family ipv4 vrf {{key}}
 !
 {%endfor%}
 !
-address-family ipv6 unicast
-exit-address-family
 ip forward-protocol nd
 no ip http server
 no ip http secure-server
