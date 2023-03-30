@@ -60,14 +60,24 @@ interface {{ interface.name }}
 !
 {% if router.bgp.bool %}
 router bgp {{router.bgp.as_number}}
+  {% if router.vrfClient %}
+ bgp log-neighbor-changes
+ redistribute connected
+  {% for add in router.vrfClientAdd %}
+ neighbor {{add[0]}} remote-as {{add[1]}}
+ neighbor {{add[0]}} allowas-in
+  {%endfor%}
+ 
+  {% else %}
  bgp router-id {{router.bgp.routerId}}
  bgp log-neighbor-changes
- {% for neighbor in router.bgp.neighbors %}
+    {% for neighbor in router.bgp.neighbors %}
  neighbor {{neighbor.ipAdd}} remote-as {{neighbor.remote_as}}
-  {% if router.loopback and not neighbor.noLoopback %}
+      {% if router.loopback and not neighbor.noLoopback %}
  neighbor {{neighbor.ipAdd}} update-source {{router.loopback.name}}
-  {% endif %}
- {%endfor%}
+      {% endif %}
+    {%endfor%}
+ {% endif %}
 {%endif%}
 address-family vpnv4
 {% for neighbor in router.bgp.neighbors %}

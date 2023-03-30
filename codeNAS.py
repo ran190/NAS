@@ -139,10 +139,16 @@ def handle_network(network):
             vrf= Vrf()
             if link['vrfName'] in ASList[link['firstAS']][link['firstRouter']].vrfs :
                 ASList[link['firstAS']][link['firstRouter']].vrfs[link['vrfName']].add.append(int2.add)
+                
             else:
                 vrf.as_target=link['secondAS']
                 vrf.add=[int2.add]
                 ASList[link['firstAS']][link['firstRouter']].vrfs[link['vrfName']]=vrf
+            ASList[link['secondAS']][link['secondRouter']].vrfClient=True
+            if hasattr(ASList[link['secondAS']][link['secondRouter']], "vrfClientAdd"):
+                ASList[link['secondAS']][link['secondRouter']].vrfClientAdd.append([int1.add,link['firstAS']])
+            else:
+                ASList[link['secondAS']][link['secondRouter']].vrfClientAdd=[[int1.add,link['firstAS']]]
         else:
             neighb1 = Neighbor()
             neighb1.remote_as = link['firstAS']
