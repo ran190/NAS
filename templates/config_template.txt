@@ -46,6 +46,9 @@ interface {{ router.loopback.name }}
 {%endif%}
 {% for interface in router.interfaces %}
 interface {{ interface.name }}
+{% if interface.vrf!="" %}
+ vrf forwarding {{interface.vrf}}
+{% endif %}
  ip address {{interface.add}} {{interface.mask}}
 {% if interface.ospf %}
  ip ospf {{ router.ospf.process }} area {{ interface.ospfArea }}

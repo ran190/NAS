@@ -2,6 +2,7 @@
     "AS": [
       {
         "number": "100",
+        "type" : "provider",
         "IpRange": {
           "start": "192.168.1.",
           "prefix": ""
@@ -98,6 +99,7 @@
     },
     {
         "number": "200",
+        "type" : "client",
         "IpRange": {
           "start": "192.168.11.",
           "prefix": ""
@@ -139,6 +141,7 @@
     },
     {
         "number": "300",
+        "type" : "client",
         "IpRange": {
           "start": "192.168.11.",
           "prefix": ""

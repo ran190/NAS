@@ -29,6 +29,7 @@ def handle_network(network):
                 if connection:
                     inter = Interface()
                     inter.name = "GigabitEthernet"+connection['interface']+"/0"
+                    inter.vrf=""
                     if connection['mpls']=="True":
                         inter.mpls=True
                         #routerObj.mpls=True
@@ -87,7 +88,7 @@ def handle_network(network):
                 routerObj.bgp = bgp
                 #def les neighbor
                 for routeur in As['routers']:
-                    if routeur['id'] != router['id'] and routeur["bgp"]=="True":
+                    if routeur['id'] != router['id'] and routeur["bgp"]=="True" and As['type']!= "client":
                         neighbor = Neighbor()
                         neighbor.remote_as = As['number']
                         neighbor.ipAdd = As['IpLoopbackRange']['start']+routeur['id']
@@ -122,8 +123,8 @@ def handle_network(network):
             int2.add = link["secondInterface"]["add"]
             int1.mask = link["firstInterface"]["mask"]
             int2.mask = link["secondInterface"]["mask"]
-        ASList[link['firstAS']][link['firstRouter']].interfaces.append(int1)
-        ASList[link['secondAS']][link['secondRouter']].interfaces.append(int2)
+            
+        
         #Rajout des int en passive int
         if hasattr(ASList[link['firstAS']][link['firstRouter']], "ospf"):
             int1.ospf = True
@@ -137,6 +138,8 @@ def handle_network(network):
             ASList[link['secondAS']][link['secondRouter']].ospf.passiveInterfaces.append(int2.name)
         if link['vrfName']!="":
             vrf= Vrf()
+            int1.vrf = link['vrfName']
+            int2.vrf = link['vrfName']
             if link['vrfName'] in ASList[link['firstAS']][link['firstRouter']].vrfs :
                 ASList[link['firstAS']][link['firstRouter']].vrfs[link['vrfName']].add.append(int2.add)
                 
@@ -150,6 +153,8 @@ def handle_network(network):
             else:
                 ASList[link['secondAS']][link['secondRouter']].vrfClientAdd=[[int1.add,link['firstAS']]]
         else:
+            int1.vrf = ""
+            int2.vrf = ""
             neighb1 = Neighbor()
             neighb1.remote_as = link['firstAS']
             neighb1.ipAdd = int1.add
@@ -160,7 +165,8 @@ def handle_network(network):
             neighb2.noLoopback = True
             ASList[link['firstAS']][link['firstRouter']].bgp.neighbors.append(neighb2)
             ASList[link['secondAS']][link['secondRouter']].bgp.neighbors.append(neighb1)
-    
+        ASList[link['firstAS']][link['firstRouter']].interfaces.append(int1)
+        ASList[link['secondAS']][link['secondRouter']].interfaces.append(int2)
 
 
     return ASList
