@@ -126,7 +126,7 @@ def handle_network(network):
         if hasattr(ASList[link['firstAS']][link['firstRouter']], "ospf"):
             int1.ospf = True
             int1.ospfArea = link['firstInterface']['ospfArea']
-            #int1.ospfCost = link['firstInterface']['ospfCost']
+            
 
             ASList[link['firstAS']][link['firstRouter']].ospf.passiveInterfaces.append(int1.name)
         if hasattr(ASList[link['secondAS']][link['secondRouter']], "ospf"):
@@ -159,7 +159,6 @@ if __name__ == '__main__':
     for AS in ASList.values():
         for router in AS.values():
             print(router.hostname)
-            #path = router.hostname+".cfg"
             path = "../Reseau_NAS/project-files/dynamips"
             cfg_file = 'i' + str(load['routerMap'][router.hostname]) + "_startup-config.cfg"
             real_path=""
